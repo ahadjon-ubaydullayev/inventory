@@ -1,0 +1,194 @@
+{% extends 'warehouse/base.html' %}
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Product List</h3>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMahsulotModal">
+        Add Mahsulot
+    </button>
+    <div class="card shadow mt-4 mb-5">
+        <div class="card-body">
+            <div class="table-responsive mt-4">
+                <table id="mahsulot-table" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nomi</th>
+                            <th>Kategoriya</th>
+                            <th>Qadoq</th>
+                            <th>Quti</th>  
+                            <th>Massa</th>
+                            <th>Miqdori</th>
+                            <th>Kelgan sana</th>
+                            <th>Tavsifi</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mahsulot in mahsulotlar %}
+                        <tr>
+                            <td>{{ mahsulot.nomi }}</td>
+                            <td>{{ mahsulot.kategoriya }}</td>
+                            <td>{{ mahsulot.qadoq }}</td>
+                            <td>{{ mahsulot.quti }}</td>
+                            <td>{{ mahsulot.massa }}</td>
+                            <td>{{ mahsulot.miqdori }}</td>
+                            <td>{{ mahsulot.kelgan_sana }}</td>
+                            <td>{{ mahsulot.tavsifi }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger add-existing-product" data-id="{{ mahsulot.id }}">
+                                    <i class="fas fa-plus fa-sm"  aria-hidden="true"></i> <!-- Font Awesome plus icon -->
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" style="z-index: 1200;" id="addMahsulotModal" tabindex="-1" role="dialog" aria-labelledby="addMahsulotModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMahsulotModalLabel">Add Mahsulot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Mahsulot Form -->
+                <form id="addMahsulotForm">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="nomi">Name:</label>
+                            <input type="text" class="form-control" id="nomi" name="nomi" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="kategoriya">Category:</label>
+                            <input type="text" class="form-control" id="kategoriya" name="kategoriya">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="qadoq">Qadoq:</label>
+                            <input type="number" class="form-control" id="qadoq" name="qadoq" min="0">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="quti">Quti:</label>
+                            <input type="number" class="form-control" id="quti" name="quti" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="massa">Massa:</label>
+                            <input type="number" class="form-control" id="massa" name="massa" min="0">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="miqdori">Quantity:</label>
+                            <input type="number" class="form-control" id="miqdori" name="miqdori" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tavsifi">Description:</label>
+                        <textarea class="form-control" id="tavsifi" name="tavsifi" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Mahsulot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Datatables -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+
+
+<script>
+
+    $(document).ready(function () {
+        // Handle form submission
+        $('#addMahsulotForm').submit(function (event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            // Serialize form data
+            var formData = $(this).serialize();
+            console.log(formData);
+
+            // Send POST request to backend
+            $.ajax({
+                url: '/mahsulot_crud/',
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    // Handle success response
+                    alert('Mahsulot added successfully');
+                    // Optionally, you can close the modal or update UI here
+                    // $('#addMahsulotModal').modal('hide');
+                    // Reload the page to refresh the Mahsulot list
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    // Handle error response
+                    var errorMessage = xhr.responseJSON.error || 'An error occurred';
+                    alert(errorMessage);
+                }
+            });
+        });
+
+
+
+        $('#mahsulot-table').DataTable({
+            "lengthMenu": [10, 25, 50, 100],
+            "pageLength": 10, // Initial page length
+            "order": [[0, "asc"]], // Sort by the first column (Name) by default
+            "responsive": true,
+            "searching": true, // Enable search functionality
+            "pagingType": "full_numbers", // Pagination type
+            "language": {
+                "lengthMenu": "Show _MENU_ entries",
+                "search": "_INPUT_",
+                "searchPlaceholder": "Search...",
+                "paginate": {
+                    "first": '<i class="fas fa-angle-double-left"></i>',
+                    "last": '<i class="fas fa-angle-double-right"></i>',
+                    "next": '<i class="fas fa-angle-right"></i>',
+                    "previous": '<i class="fas fa-angle-left"></i>'
+                }
+            }
+        });
+
+        
+    });
+</script>
+<style>
+    /* Custom CSS for table */
+    .table {
+        width: 100%;
+        /* Make table width 100% */
+        margin-bottom: 20px;
+        /* Add bottom margin */
+    }
+
+    .table tbody tr:hover {
+        background-color: #e6f7ff;
+        /* Light blueish hover color */
+    }
+
+    .table-responsive {
+        margin: 0 auto;
+        /* Center align the table */
+    }
+    .modal{
+         z-index: 1400;
+    }
+</style>
+{% endblock %}

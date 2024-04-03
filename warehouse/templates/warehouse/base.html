@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Application</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <style>
+        /* Custom styles */
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 900;
+            /* Ensure navbar is above sidebar */
+            background-color: #fff !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            /* Updated navbar shadow */
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            color: #000;
+            /* Updated navbar brand text color */
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 1rem;
+           
+            bottom: 0;
+            left: 0;
+            z-index: 800;
+            
+            padding-top: 3.5rem;
+            
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+         
+            background-color: #fff;
+         
+            color: #000;
+          
+            width: 250px;
+           
+            transition: all 0.3s ease; 
+           
+            position: fixed;
+   
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .sidebar .sidebar-header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            /* Updated sidebar header background color */
+        }
+
+        .sidebar .sidebar-menu {
+            padding-left: 0;
+        }
+
+        .sidebar .sidebar-menu li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+
+        .sidebar .sidebar-menu li a {
+            display: block;
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar .sidebar-menu li a:hover {
+            background-color: #f8f9fa;
+            border-left-color: #1abc9c;
+            /* Sidebar menu link border color on hover */
+        }
+
+        /* Page content */
+        .page-content {
+            margin-left: auto;
+            /* Adjusted to match sidebar width */
+            margin-top: 3.5rem;
+            /* Adjusted to accommodate navbar */
+        }
+         /* Icon color */
+        .sidebar .sidebar-menu li a i {
+            color: #6c757d; /* Updated icon color to gray */
+        }
+ /* Styling for the main link */
+.extendable-link {
+    position: relative; /* Position relative for absolute positioning of the caret icon */
+}
+
+/* Styling for the submenu */
+.submenu {
+    display: none; /* Initially hide the submenu */
+    padding-left: 20px; /* Indent the submenu */
+    list-style: none; /* Remove default list style */
+}
+
+/* Styling for the submenu items */
+.submenu li {
+    padding: 5px 0;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(-20px); /* Slide up animation effect */
+    transition: opacity 0.3s ease, transform 2s ease;
+}
+
+/* Animation effect when the submenu is visible */
+.submenu.show {
+    display: block;
+}
+
+.submenu.show li {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.2s;
+}
+
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                Your Brand
+            </a>
+                <button class="navbar-toggler" type="button" id="sidebarToggle">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <!-- <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="text-primary">Menyu</h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i> Bosh Sahifa</a></li>
+            <li><a href="{% url 'mahsulotlar' %}"><i class="fas fa-box"></i> Mahsulotlar</a></li>
+            <li><a href="#"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </div>  -->
+
+    <div class="sidebar active" id="sidebar">
+        <div class="sidebar-header">
+            <h5 class="text-primary">Menyu</h5>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i> Bosh Sahifa</a></li>
+            <li><a href="{% url 'mahsulotlar' %}"><i class="fas fa-box"></i> Omborxona</a></li>
+            <li>
+                <a href="#" class="extendable-link">
+                    <i class="fas fa-users"></i> <span>Mahsulotlar</span> <i class="fas fa-caret-down"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href=""><i class="fas fa-plus"></i> Mahsulot qo'shish</a></li>
+                    <li><a href=""><i class="fas fa-paper-plane"></i> Mahsulot jo'natish</a></li>
+                </ul>
+            </li>
+            <li><a href="#"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </div>
+    <!-- Page content -->
+    <div class="page-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                    <!-- Main content goes here -->
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+        integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+        crossorigin="anonymous"></script>
+
+    <!-- Bootstrap JS -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8yDFL0e1aL0L2+nQl0yZxs7dF1WxukI2O0F3hQ"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+   <script>
+      
+</script>
+<script>
+  document.querySelectorAll('.extendable-link').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default behavior of the link
+            var submenu = this.nextElementSibling; // Get the submenu element
+            if (submenu.classList.contains('show')) {
+                submenu.classList.remove('show'); // Hide the submenu if it's already visible
+            } else {
+                submenu.classList.add('show'); // Show the submenu
+            }
+        });
+    });
+
+      function addOrUpdateProduct(data) {
+            $.ajax({
+                url: '/mahsulot_crud/',
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token for Django
+                },
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    console.log(response);
+                    // Handle response data as needed
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+</script>
+    {% block scripts %}
+    {% endblock  %}
+</body>
+
+</html>
