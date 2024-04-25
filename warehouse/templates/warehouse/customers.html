@@ -2,9 +2,9 @@
 {% block content %}
 
 <div class="container-fluid">
-    <h3 class="mt-4">Customer List</h3>
+    <h3 class="mt-4">Mijozlar</h3>
     <button type="button" class="btn btn-primary" data-toggle="modal"  data-target="#addCustomerModal" data-tooltip="Mijoz Qo'shish">
-        Add Customer
+        Mijoz qo'shish
     </button>
     <div class="card shadow mt-4 mb-5">
         <div class="card-body">
@@ -12,9 +12,9 @@
                 <table id="customer-table" class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Phone Number</th>
+                            <th>Nomi</th>
+                            <th>Manzili</th>
+                            <th>Telefon raqami</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -56,18 +56,18 @@
             <div class="modal-body">
                 <form id="addCustomerForm">
                     <div class="form-group">
-                        <label for="customerName">Name</label>
+                        <label for="customerName">Nomi</label>
                         <input type="text" class="form-control" id="customerName" name="customerName" required>
                     </div>
                     <div class="form-group">
-                        <label for="customerLocation">Location</label>
+                        <label for="customerLocation">Manzili</label>
                         <input type="text" class="form-control" id="customerLocation" name="customerLocation">
                     </div>
                     <div class="form-group">
-                        <label for="customerPhoneNumber">Phone Number</label>
+                        <label for="customerPhoneNumber">Telefon raqami</label>
                         <input type="text" class="form-control" id="customerPhoneNumber" name="customerPhoneNumber">
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Customer</button>
+                    <button type="submit" class="btn btn-primary">Mijoz qo'shish</button>
                 </form>
             </div>
         </div>
@@ -80,7 +80,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editCustomerModalLabel">Edit Customer</h5>
+                <h5 class="modal-title" id="editCustomerModalLabel">Tahrirlar</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -90,18 +90,18 @@
                 <form id="editCustomerForm">
                     <input type="hidden" id="editCustomerId" name="id">
                     <div class="form-group">
-                        <label for="customerName">Name:</label>
+                        <label for="customerName">Nomi:</label>
                         <input type="text" class="form-control" id="editCustomerName" name="customerName" required>
                     </div>
                     <div class="form-group">
-                        <label for="customerLocation">Location:</label>
+                        <label for="customerLocation">Manzili:</label>
                         <input type="text" class="form-control" id="editCustomerLocation" name="customerLocation">
                     </div>
                     <div class="form-group">
-                        <label for="customerPhoneNumber">Phone Number:</label>
+                        <label for="customerPhoneNumber">Telefon raqami:</label>
                         <input type="text" class="form-control" id="editCustomerPhoneNumber" name="customerPhoneNumber">
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
                 </form>
             </div>
         </div>
