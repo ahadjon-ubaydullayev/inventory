@@ -1,11 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Mahsulot
 import json
-from django.shortcuts import render, redirect
-from .models import CustomUser
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import CustomUser, Customer, Mahsulot, ProductHistory
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.db.models import Count
 
 
 def logout_view(request):
@@ -30,9 +30,42 @@ def login_view(request):
 
 
 def dashboard(request):
-    mahsulotlar = Mahsulot.objects.all()
-    print(request.user.is_authenticated)
-    return render(request, 'warehouse/dashboard.html', {'mahsulotlar': mahsulotlar, 'user': request.user})
+    most_products = Mahsulot.objects.order_by(
+        '-miqdori')[:5]  # Fetch top 5 products by quantity
+    most_received = ProductHistory.objects.filter(
+        transaction_type='Addition').order_by('-timestamp')[:5]
+    most_sent = ProductHistory.objects.filter(
+        transaction_type='Substraction').order_by('-timestamp')[:5]
+    recently_edited = Mahsulot.objects.order_by(
+        '-kelgan_sana')[:5]  # Fetch top 5 recently edited products
+
+    context = {
+        'most_products': most_products,
+        'most_received': most_received,
+        'most_sent': most_sent,
+        'recently_edited': recently_edited,
+    }
+    return render(request, 'warehouse/dashboard.html', context)
+
+
+def dashboard_charts_data(request):
+    most_products = Mahsulot.objects.order_by(
+        '-miqdori')[:5].values('nomi', 'miqdori')
+    recently_edited = Mahsulot.objects.order_by(
+        '-kelgan_sana')[:5].values('nomi', 'kelgan_sana')
+    # most_received = ProductHistory.objects.filter(transaction_type='Addition').values(
+    #     'product__nomi').annotate(total_received=Count('product')).order_by('-total_received')[:5]
+    # most_sent = ProductHistory.objects.filter(transaction_type='Substraction').values(
+    #     'product__nomi').annotate(total_sent=Count('product')).order_by('-total_sent')[:5]
+
+    data = {
+        'most_products': list(most_products),
+        'recently_edited': list(recently_edited),
+        # 'most_received': list(most_received),
+        # 'most_sent': list(most_sent)
+    }
+
+    return JsonResponse(data)
 
 
 def dashboard_manager(request):
@@ -42,7 +75,8 @@ def dashboard_manager(request):
 
 def mahsulot_list(request):
     mahsulotlar = Mahsulot.objects.all()
-    return render(request, 'warehouse/mahsulotlar.html', {'mahsulotlar': mahsulotlar})
+    customers = Customer.objects.all()
+    return render(request, 'warehouse/mahsulotlar.html', {'mahsulotlar': mahsulotlar, 'customers': customers})
 
 
 @csrf_exempt
@@ -65,14 +99,20 @@ def mahsulot_crud(request):
             nomi=nomi, kategoriya=kategoriya).first()
 
         if existing_product:
-            # If the product exists, update its quantity
             existing_product.miqdori += int(miqdori)
             existing_product.qadoq += int(qadoq)
             existing_product.quti += int(quti)
             existing_product.save()
+            # Log history of adding product
+            item = ProductHistory.objects.create(
+                product_id=existing_product.pk,
+                transaction_type='Addition',
+                quantity=miqdori
+            )
+            print(item)
+            item.save()
             return JsonResponse({'message': 'Mahsulot quantity updated successfully', 'mahsulot_id': existing_product.pk})
         else:
-            # If the product doesn't exist, create a new one
             mahsulot = Mahsulot.objects.create(
                 nomi=nomi,
                 kategoriya=kategoriya,
@@ -82,6 +122,12 @@ def mahsulot_crud(request):
                 miqdori=miqdori,
                 kelgan_sana=kelgan_sana,
                 tavsifi=tavsifi
+            )
+            # Log history of adding product
+            ProductHistory.objects.create(
+                product_id=mahsulot.pk,
+                transaction_type='Addition',
+                quantity=miqdori
             )
             return JsonResponse({'message': 'Mahsulot created successfully', 'mahsulot_id': mahsulot.pk})
 
@@ -95,7 +141,7 @@ def mahsulot_crud(request):
             mahsulot = Mahsulot.objects.get(pk=mahsulot_id)
         except Mahsulot.DoesNotExist:
             return JsonResponse({'error': 'Mahsulot does not exist'}, status=404)
-
+        existing_amount = mahsulot.miqdori
         mahsulot.nomi = data.get('nomi', mahsulot.nomi)
         mahsulot.kategoriya = data.get('kategoriya', mahsulot.kategoriya)
         mahsulot.qadoq = data.get('qadoq', mahsulot.qadoq)
@@ -104,15 +150,21 @@ def mahsulot_crud(request):
         mahsulot.miqdori = data.get('miqdori', mahsulot.miqdori)
         mahsulot.kelgan_sana = data.get('kelgan_sana', mahsulot.kelgan_sana)
         mahsulot.tavsifi = data.get('tavsifi', mahsulot.tavsifi)
-
         mahsulot.save()
+
+        added_amount = int(mahsulot.miqdori) - int(existing_amount)
+        ProductHistory.objects.create(
+            product_id=mahsulot_id,
+            transaction_type='Addition',
+            quantity=added_amount  # Assuming miqdori represents the quantity added
+        )
         return JsonResponse({'message': 'Mahsulot updated successfully'})
 
     elif request.method == 'DELETE':
         data = json.loads(request.body)
         mahsulot_id = data.get('id')
         if not mahsulot_id:
-            return JsonResponse({'error': 'ID is required for deletion'}, status=400)
+            return JsonResponse({'error': 'ID is required for ddeletion'}, status=400)
 
         try:
             mahsulot = Mahsulot.objects.get(pk=mahsulot_id)
@@ -121,3 +173,132 @@ def mahsulot_crud(request):
 
         mahsulot.delete()
         return JsonResponse({'message': 'Mahsulot deleted successfully'})
+
+
+@csrf_exempt
+def send_product(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        product_id = data.get('product_id')
+        quantity = data.get('quantity')
+        customer_id = data.get('customer_id')
+
+        if not (product_id and quantity and customer_id):
+            return JsonResponse({'error': 'Product ID, quantity, and customer ID are required'}, status=400)
+
+        try:
+            product = Mahsulot.objects.get(pk=product_id)
+            customer = Customer.objects.get(pk=customer_id)
+        except (Mahsulot.DoesNotExist, Customer.DoesNotExist):
+            return JsonResponse({'error': 'Product or customer does not exist'}, status=404)
+
+        if product.miqdori < int(quantity):
+            return JsonResponse({'error': 'Not enough quantity available'}, status=400)
+
+        product.miqdori -= int(quantity)
+        product.save()
+        ProductHistory.objects.create(
+            product_id=product_id,
+            customer_id=customer_id,
+            transaction_type='Substraction',
+            quantity=quantity
+        )
+
+        return JsonResponse({'message': 'Product sent successfully'})
+
+
+@csrf_exempt
+def get_product_data(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('id')
+        try:
+            product = Mahsulot.objects.get(pk=product_id)
+            product_data = {
+                'id': product.id,
+                'nomi': product.nomi,
+                'kategoriya': product.kategoriya,
+                'qadoq': product.qadoq,
+                'quti': product.quti,
+                'massa': product.massa,
+                'miqdori': product.miqdori,
+                'kelgan_sana': product.kelgan_sana,
+                'tavsifi': product.tavsifi
+            }
+            return JsonResponse(product_data)
+        except Mahsulot.DoesNotExist:
+            return JsonResponse({'error': 'Product does not exist'}, status=404)
+
+
+def customers(request):
+    customers = Customer.objects.all()
+    return render(request, 'warehouse/customers.html', {'customers': customers})
+
+
+@csrf_exempt
+def customer_crud(request, id=None):
+    if request.method == 'GET':
+        if request.GET.get('id'):
+            customer_id = request.GET.get('id')
+            customer = get_object_or_404(Customer, id=customer_id)
+            return JsonResponse({'customer': {
+                'id': customer.pk,
+                'name': customer.name,
+                'location': customer.location,
+                'phone_number': customer.phone_number,
+            }})
+        else:
+            customers = list(Customer.objects.values())
+            return JsonResponse(customers, safe=False)
+
+    elif request.method == 'POST':
+        name = request.POST.get('customerName')
+        location = request.POST.get('customerLocation')
+        phone_number = request.POST.get('customerPhoneNumber')
+        customer = Customer.objects.create(
+            name=name, location=location, phone_number=phone_number)
+        return JsonResponse({'message': 'Customer created successfully', 'customer_id': customer.pk})
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        customer_id = data.get('id')
+        customer = get_object_or_404(Customer, id=customer_id)
+        customer.name = data.get('name', customer.name)
+        customer.location = data.get('location', customer.location)
+        customer.phone_number = data.get('phone_number', customer.phone_number)
+        customer.save()
+        return JsonResponse({'message': 'Customer updated successfully'})
+
+    elif request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            customer_id = data.get('id')
+            print("this is id:", customer_id)
+
+            if not customer_id:
+                print("id not found", customer_id)
+                return JsonResponse({'error': 'ID is required for deletion'}, status=400)
+            customer = Customer.objects.get(id=customer_id)
+            customer.delete()
+            return JsonResponse({'message': 'Customer deleted successfully'})
+
+        except Customer.DoesNotExist:
+            return JsonResponse({'error': 'Customer does not exist'}, status=404)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Unsupported HTTP method'}, status=405)
+
+
+# history
+def product_history(request):
+    history = ProductHistory.objects.all().order_by('-timestamp')
+    return render(request, 'warehouse/product_history.html', {'history': history})
+
+
+def get_product_name(product_id):
+    product = get_object_or_404(Mahsulot, id=product_id)
+    return product.nomi

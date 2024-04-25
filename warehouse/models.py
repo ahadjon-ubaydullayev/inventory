@@ -16,6 +16,15 @@ class Mahsulot(models.Model):
         return self.nomi
 
 
+class Customer(models.Model):
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUser(AbstractUser):
     is_manager = models.BooleanField(default=False)
 
@@ -34,3 +43,13 @@ class CustomUser(AbstractUser):
         blank=True,
         help_text='Specific permissions for this user.',
     )
+
+
+class ProductHistory(models.Model):
+    product_id = models.IntegerField()
+    transaction_type = models.CharField(
+        max_length=10)  # 'Addition' or 'Sending'
+    quantity = models.IntegerField()
+    customer_id = models.IntegerField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)

@@ -1,0 +1,187 @@
+table .table {
+      width: 100%;
+      /* Make table width 100% */
+      margin-bottom: 20px;
+      /* Add bottom margin */
+  }
+
+  .table tbody tr:hover {
+      background-color: #e6f7ff;
+      /* Light blueish hover color */
+  }
+
+  .table-responsive {
+      margin: 0 auto;
+      /* Center align the table */
+  }
+
+  .modal {
+      z-index: 1400;
+  }
+
+
+
+/* for sidebar */
+
+  /* Custom styles */
+  /* Navbar */
+  .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 900;
+      /* Ensure navbar is above sidebar */
+      background-color: #fff !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      /* Updated navbar shadow */
+  }
+
+  .navbar-brand {
+      font-size: 1.25rem;
+      color: #000;
+      /* Updated navbar brand text color */
+  }
+
+  /* Sidebar */
+  .sidebar {
+      position: fixed;
+      top: 1rem;
+
+      bottom: 0;
+      left: 0;
+      z-index: 800;
+
+      padding-top: 3.5rem;
+
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+
+      background-color: #fff;
+
+      color: #000;
+
+      width: 250px;
+
+      transition: all 0.3s ease;
+
+      position: fixed;
+
+  }
+
+  .sidebar-toggle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 10px;
+      cursor: pointer;
+  }
+
+  .sidebar .sidebar-header {
+      padding: 20px;
+      background-color: #f8f9fa;
+      /* Updated sidebar header background color */
+  }
+
+  .sidebar .sidebar-menu {
+      padding-left: 0;
+  }
+
+  .sidebar .sidebar-menu li {
+      list-style: none;
+      margin-bottom: 10px;
+  }
+
+  .sidebar .sidebar-menu li a {
+      display: block;
+      color: #000;
+      text-decoration: none;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+  }
+
+  .sidebar .sidebar-menu li a:hover {
+      background-color: #f8f9fa;
+      border-left-color: #1abc9c;
+      /* Sidebar menu link border color on hover */
+  }
+
+  /* Page content */
+  .page-content {
+      margin-left: auto;
+      /* Adjusted to match sidebar width */
+      margin-top: 3.5rem;
+      /* Adjusted to accommodate navbar */
+  }
+
+  /* Icon color */
+  .sidebar .sidebar-menu li a i {
+      color: #6c757d;
+      /* Updated icon color to gray */
+  }
+
+  /* Styling for the main link */
+  .extendable-link {
+      position: relative;
+      /* Position relative for absolute positioning of the caret icon */
+  }
+
+  /* Styling for the submenu */
+  .submenu {
+      display: none;
+      /* Initially hide the submenu */
+      padding-left: 20px;
+      /* Indent the submenu */
+      list-style: none;
+      /* Remove default list style */
+  }
+
+  /* Styling for the submenu items */
+  .submenu li {
+      padding: 5px 0;
+      opacity: 0;
+      /* Initially hidden */
+      transform: translateY(-20px);
+      /* Slide up animation effect */
+      transition: opacity 0.3s ease, transform 2s ease;
+  }
+
+  /* Animation effect when the submenu is visible */
+  .submenu.show {
+      display: block;
+  }
+
+  .submenu.show li {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.2s;
+  }
+
+
+/* toast */
+.toast {
+    max-width: 350px;
+    width: max-content;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.toast-header {
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.toast-body {
+    padding: 10px 20px;
+}
+
+.close {
+    color: white;
+    outline: none;
+}
+
+.close:hover {
+    color: rgba(255, 255, 255, 0.5);
+}
+

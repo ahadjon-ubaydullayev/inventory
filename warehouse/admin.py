@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Mahsulot, CustomUser
+from .models import Mahsulot, CustomUser, Customer, ProductHistory
 
 
 @admin.register(Mahsulot)
@@ -8,6 +8,18 @@ class MahsulotAdmin(admin.ModelAdmin):
     list_display = ('nomi', 'kategoriya', 'qadoq',
                     'quti', 'massa', 'miqdori', 'kelgan_sana', 'tavsifi')
     search_fields = ('nomi', 'kategoriya', 'kelgan_sana')
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'location', 'phone_number')
+    search_fields = ('name', 'location', 'phone_number')
+
+
+@admin.register(ProductHistory)
+class ProductHistoryAdmin(admin.ModelAdmin):
+    list_display = ('product_id', 'transaction_type', 'quantity')
+    search_fields = ('product_id', 'transaction_type', 'quantity')
 
 
 class CustomUserAdmin(UserAdmin):

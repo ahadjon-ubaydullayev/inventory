@@ -1,6 +1,78 @@
 {% extends 'warehouse/base.html' %}
 {% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4">Dashboard</h1>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Most Products in Storage
+                </div>
+                <div class="card-body">
+                    <canvas id="mostProductsChart" width="400" height="200"></canvas>
+                    <!-- <ul id="mostProductsList">
+                        {% for product in most_products %}
+                        <li>{{ product}}</li>
+                        {% endfor %}
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Most Received Products
+                </div>
+                <div class="card-body">
+                    <canvas id="mostReceivedChart" width="400" height="200"></canvas>
+                    <!-- <ul id="mostReceivedList">
+                        {% for product in most_received %}
+                        <li>{{ product}}</li>
+                        {% endfor %}
+                    </ul> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Most Sent Products
+                </div>
+                <div class="card-body">
+                    <ul id="mostSentList">
+                        <canvas id="mostSentChart" width="400" height="200"></canvas>
+                        <!-- {% for product in most_sent %}
+                        <li>{{ product}}</li>
+                        {% endfor %} -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Recently Edited Products
+                </div>
+                <div class="card-body">
+                    <ul id="recentlyEditedList">
+                        {% for product in recently_edited %}
+                        <li>{{ product}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    // Fetch data from backend and populate charts and cards
+    // Use Chart.js to render charts
+    // Use JavaScript to populate cards dynamically
+</script>
+</body>
 {% endblock %}
 
 {% block scripts %}

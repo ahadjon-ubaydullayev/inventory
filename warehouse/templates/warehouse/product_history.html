@@ -1,0 +1,94 @@
+{% extends 'warehouse/base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+    <h3 class="mt-4">Mahsulotlar Tarixi</h3>
+    <div class="card shadow mt-4 mb-5">
+        <div class="card-body">
+            <div class="table-responsive mt-4">
+                <table id="customer-history-table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mahsulot Nomi</th>
+                            <th>Holati</th>
+                            <th>Miqdori</th>
+                            <th>Mijoz</th>
+                            <th>Sana</th>
+                            <th>Tavsif</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in history %}
+                        <tr class="{% if entry.transaction_type == 'Addition' %} addition-row {% elif entry.transaction_type == 'Substraction' %} substraction-row {% endif %}">
+                            <td>{{ entry.id }}</td>
+                            <td>
+                                {% if entry.transaction_type == 'Addition' %}
+                                <span>Qo'shildi</span>
+                                {% elif entry.transaction_type == 'Substraction' %}
+                                <span>Jo'natildi</span>
+                                {% else %}
+                                
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if entry.transaction_type == 'Addition' %}
+                                <span style=" font-weight: bold;">+</span>{{ entry.quantity }}
+                                {% elif entry.transaction_type == 'Substraction' %}
+                                <span style=" font-weight: bold;">-</span>{{ entry.quantity }}
+                                {% else %}
+                                <span style=" font-weight: bold;">-</span>
+                                {% endif %}</td>
+                            <td>
+                                {% if entry.customer_id %}
+                                {{ entry.customer_id }}
+                                {% else %}
+                                <span style=" font-weight: bold;">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ entry.timestamp }}</td>
+                            <td>
+                                {% if entry.description %}
+                                {{ entry.description }}
+                                {% else %}
+                                <span style=" font-weight: bold;">-</span>
+                                {% endif %}
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.addition-row {
+    color:#1976D2;
+}
+
+.substraction-row {
+    color: #FF5252;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;
+    margin: 0 2px;
+    /* border: 1px solid #ccc;
+    border-radius: 5px; */
+    background-color: #f8f9fa;
+    color: #1976D2;
+    cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e9ecef;
+}
+
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
