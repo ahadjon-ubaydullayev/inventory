@@ -2,10 +2,18 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import CustomUser, Customer, Mahsulot, ProductHistory
+from .models import Customer, Mahsulot, ProductHistory
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Count
+
+
+def login_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 def logout_view(request):
@@ -29,21 +37,18 @@ def login_view(request):
     return render(request, 'auth/login.html')
 
 
+@login_required
 def dashboard(request):
-    most_products = Mahsulot.objects.order_by(
-        '-miqdori')[:5]  # Fetch top 5 products by quantity
-    most_received = ProductHistory.objects.filter(
-        transaction_type='Addition').order_by('-timestamp')[:5]
-    most_sent = ProductHistory.objects.filter(
-        transaction_type='Substraction').order_by('-timestamp')[:5]
-    recently_edited = Mahsulot.objects.order_by(
-        '-kelgan_sana')[:5]  # Fetch top 5 recently edited products
+    total_products = Mahsulot.objects.count()
+    total_customers = Customer.objects.count()
 
+    recently_edited = ProductHistory.objects.order_by(
+        '-timestamp').values('product_id', 'transaction_type')[:5]
     context = {
-        'most_products': most_products,
-        'most_received': most_received,
-        'most_sent': most_sent,
+        'total_products': total_products,
+        'total_customers': total_customers,
         'recently_edited': recently_edited,
+
     }
     return render(request, 'warehouse/dashboard.html', context)
 
@@ -51,18 +56,15 @@ def dashboard(request):
 def dashboard_charts_data(request):
     most_products = Mahsulot.objects.order_by(
         '-miqdori')[:5].values('nomi', 'miqdori')
-    recently_edited = Mahsulot.objects.order_by(
-        '-kelgan_sana')[:5].values('nomi', 'kelgan_sana')
-    # most_received = ProductHistory.objects.filter(transaction_type='Addition').values(
-    #     'product__nomi').annotate(total_received=Count('product')).order_by('-total_received')[:5]
-    # most_sent = ProductHistory.objects.filter(transaction_type='Substraction').values(
-    #     'product__nomi').annotate(total_sent=Count('product')).order_by('-total_sent')[:5]
-
+    most_received = ProductHistory.objects.filter(transaction_type='Addition').values(
+        'product_id').annotate(total_received=Count('product_id')).order_by('-total_received')[:5]
+    most_sent = ProductHistory.objects.filter(transaction_type='Substraction').values(
+        'product_id').annotate(total_sent=Count('product_id')).order_by('-total_sent')[:5]
     data = {
         'most_products': list(most_products),
-        'recently_edited': list(recently_edited),
-        # 'most_received': list(most_received),
-        # 'most_sent': list(most_sent)
+        # 'recently_edited': list(recently_edited),
+        'most_received': list(most_received),
+        'most_sent': list(most_sent)
     }
 
     return JsonResponse(data)
@@ -73,6 +75,7 @@ def dashboard_manager(request):
     return render(request, 'warehouse/manager_dashboard.html', {'mahsulotlar': mahsulotlar})
 
 
+@login_required
 def mahsulot_list(request):
     mahsulotlar = Mahsulot.objects.all()
     customers = Customer.objects.all()
@@ -80,6 +83,7 @@ def mahsulot_list(request):
 
 
 @csrf_exempt
+@login_required
 def mahsulot_crud(request):
     if request.method == 'GET':
         mahsulotlar = list(Mahsulot.objects.values())
@@ -164,7 +168,7 @@ def mahsulot_crud(request):
         data = json.loads(request.body)
         mahsulot_id = data.get('id')
         if not mahsulot_id:
-            return JsonResponse({'error': 'ID is required for ddeletion'}, status=400)
+            return JsonResponse({'error': 'ID is required for deletion'}, status=400)
 
         try:
             mahsulot = Mahsulot.objects.get(pk=mahsulot_id)
@@ -175,6 +179,7 @@ def mahsulot_crud(request):
         return JsonResponse({'message': 'Mahsulot deleted successfully'})
 
 
+# @login_required
 @csrf_exempt
 def send_product(request):
     if request.method == 'POST':
@@ -229,11 +234,13 @@ def get_product_data(request):
             return JsonResponse({'error': 'Product does not exist'}, status=404)
 
 
+@login_required
 def customers(request):
     customers = Customer.objects.all()
     return render(request, 'warehouse/customers.html', {'customers': customers})
 
 
+@login_required
 @csrf_exempt
 def customer_crud(request, id=None):
     if request.method == 'GET':
@@ -294,6 +301,7 @@ def customer_crud(request, id=None):
 
 
 # history
+@login_required
 def product_history(request):
     history = ProductHistory.objects.all().order_by('-timestamp')
     return render(request, 'warehouse/product_history.html', {'history': history})

@@ -7,7 +7,7 @@ class Mahsulot(models.Model):
     kategoriya = models.CharField(max_length=255, blank=True, null=True)
     qadoq = models.IntegerField(default=0, blank=True, null=True)  # pachka
     quti = models.IntegerField(default=0)  # karobka
-    massa = models.IntegerField(default=0)
+    massa = models.FloatField(default=0)
     miqdori = models.IntegerField(default=0)
     kelgan_sana = models.DateField(auto_now_add=True)
     tavsifi = models.TextField(blank=True, null=True)
@@ -26,6 +26,9 @@ class Customer(models.Model):
 
 
 class CustomUser(AbstractUser):
+    name = models.CharField(max_length=255)
+    photo = models.ImageField(
+        upload_to='profile_photos', null=True, blank=True)
     is_manager = models.BooleanField(default=False)
 
     # Define unique related_names for groups and user_permissions fields

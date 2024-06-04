@@ -7,6 +7,11 @@
     </button>
     <div class="card shadow mt-4 mb-5">
         <div class="card-body">
+            <div class="exports">
+                <a href="">Export to PDF</a>
+                <a href="">Export to PDF</a>
+                <a href="">Export to PDF</a>
+            </div>
             <div class="table-responsive mt-4">
                 <table id="mahsulot-table" class="table table-striped table-hover">
                     <thead>
@@ -55,7 +60,7 @@
     </div>
 </div>
 
-
+<!-- add mahsulot modal -->
 <div class="modal fade" style="z-index: 1200;" id="addMahsulotModal" tabindex="-1" role="dialog" aria-labelledby="addMahsulotModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -92,7 +97,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="massa">Massa:</label>
-                            <input type="number" class="form-control" id="massa" name="massa" min="0">
+                            <input type="text" class="form-control" id="massa" name="massa" pattern="[0-9]+([.,][0-9]+)?" title="Please enter a valid number" min="0">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="miqdori">Quantity:</label>
@@ -124,7 +129,7 @@
             </div>
             <div class="modal-body">
                 <!-- Add Existing Product Form -->
-                <form id="addExistingProductForm">
+                <form id="addExistingProductForm"> 
                     <input type="hidden" id="existingProductId" name="id">
                     <div class="form-group">
                         <label for="existingProductName">Product Name:</label>

@@ -17,9 +17,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <div class="" style="margin-left: -180px;"><a class="navbar-brand" href="#">
                 ASMO
-            </a>
+            </a></div>
+            
                 <button class="navbar-toggler" type="button" id="sidebarToggle">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -52,8 +53,8 @@
                     <i class="fas fa-users"></i> <span>Mahsulotlar</span> <i class="fas fa-caret-down"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href=""><i class="fas fa-plus"></i> Mahsulot qo'shish</a></li>
-                    <li><a href=""><i class="fas fa-paper-plane"></i> Mahsulot jo'natish</a></li>
+                    <li><a  href="{% url 'elektrod' %}"><i class="fas fa-bolt"></i> Elektrodlar</a></li>
+                    <!-- <li><a href=""><i class="fas fa-paper-plane"></i> Mahsulot jo'natish</a></li> -->
                 </ul>
             </li>
             <li><a href="{% url 'customers' %}"><i class="fas fa-users"></i> Mijozlar </a></li>

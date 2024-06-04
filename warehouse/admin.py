@@ -25,7 +25,8 @@ class ProductHistoryAdmin(admin.ModelAdmin):
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     # Add 'is_manager' to the list display
-    list_display = ['username', 'email', 'is_staff', 'is_manager']
+    list_display = ['username', 'email',
+                    'is_staff', 'is_manager', 'name', 'photo']
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('email',)}),

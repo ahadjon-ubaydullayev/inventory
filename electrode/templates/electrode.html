@@ -1,0 +1,346 @@
+{% extends 'warehouse/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="mt-4">Elektrod</h3>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addElectrodeModal"
+        data-tooltip="Elektrod qo'shish">
+        Elektrod qo'shish
+    </button>
+    <div class="card shadow mt-4 mb-5">
+        <div class="card-body">
+            <div class="exports">
+                <a href="">Export to PDF</a>
+                <a href="">Export to PDF</a>
+                <a href="">Export to PDF</a>
+            </div>
+            <div class="table-responsive mt-4">
+                <table id="electrode-table" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Label</th>
+                            <th>Category</th>
+                            <th>Package</th>
+                            <th>Box</th>
+                            <th>Weight</th>
+                            <th>Count by Label</th>
+                            <th>Added Date</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for electrode in electrodes %}
+                        <tr>
+                            <td>{{ electrode.id }}</td>
+                            <td>{{ electrode.label.label_name }}</td>
+                            <td>{{ electrode.category.category_name }}</td>
+                            <td>{{ electrode.package }}</td>
+                            <td>{{ electrode.box }}</td>
+                            <td>{{ electrode.weight }}</td>
+                            <td>{{ electrode.count_by_label }}</td>
+                            <td>{{ electrode.added_date }}</td>
+                            <td>{{ electrode.description }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary add-existing-electrode" data-id="{{ electrode.id }}" data-toggle="modal"
+                                    data-target="#addExistingElectrodeModal" data-tooltip="Add Existing Electrode">
+                                    <i class="fas fa-plus fa-sm" aria-hidden="true"></i>
+                                </button>
+
+                                <!-- Add/Edit/Delete buttons -->
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Electrode Modal -->
+<div class="modal fade" style="z-index: 1200;" id="addElectrodeModal" tabindex="-1" role="dialog"
+    aria-labelledby="addElectrodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addElectrodeModalLabel">Add Electrode</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Electrode Form -->
+                <form id="addElectrodeForm">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="label">Label:</label>
+                            <select class="form-control" id="label" name="label" required>
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="category">Category:</label>
+                            <select class="form-control" id="category" name="category" required>
+                                <!-- Options will be dynamically populated -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="package">Package:</label>
+                            <input type="number" class="form-control" id="package" name="package" min="0">
+                        </div>
+                        <!-- <div class="form-group col-md-6">
+                            <label for="count_by_label">Count by Label:</label>
+                            <input type="number" class="form-control" id="count_by_label" name="count_by_label" min="0">
+                        </div> -->
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Electrode</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- add existing electrode modal -->
+<div class="modal fade" style="z-index: 1200;" id="addExistingElectrodeModal" tabindex="-1" role="dialog"
+    aria-labelledby="addExistingElectrodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addExistingElectrodeModalLabel">Add Existing Electrode</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Existing Electrode Form -->
+                <form id="addExistingElectrodeForm">
+                    <input type="hidden" id="existingElectrodeId" name="id">
+                    <div class="form-group">
+                        <label for="existingElectrodeLabel">Label:</label>
+                        <input type="text" class="form-control" id="existingElectrodeLabel" name="existingElectrodeLabel" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="existingElectrodeCategory">Category:</label>
+                        <input type="text" class="form-control" id="existingElectrodeCategory" name="existingElectrodeCategory"
+                            readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="existingElectrodePackage">Package:</label>
+                        <input type="number" class="form-control" id="existingElectrodePackage" name="existingElectrodePackage" min="0"
+                            required>
+                    </div>
+                    <!-- Add other fields as needed -->
+                    <button type="submit" class="btn btn-primary">Add Existing Electrode</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(document).ready(function () {
+         $('#electrode-table').DataTable({
+            "lengthMenu": [10, 25, 50, 100],
+            "pageLength": 10, // Initial page length
+            "order": [[0, "asc"]], // Sort by the first column (Name) by default
+            "responsive": true,
+            "searching": true, // Enable search functionality
+            "pagingType": "full_numbers", // Pagination type
+            "language": {
+                "lengthMenu": "Show _MENU_ entries",
+                "search": "_INPUT_",
+                "searchPlaceholder": "Search...",
+                "paginate": {
+                    "first": '<i class="fas fa-angle-double-left"></i>',
+                    "last": '<i class="fas fa-angle-double-right"></i>',
+                    "next": '<i class="fas fa-angle-right"></i>',
+                    "previous": '<i class="fas fa-angle-left"></i>'
+                }
+            }
+        });
+        // Function to populate labels in the form
+        function populateLabels() {
+            $.ajax({
+                url: '/elektrod/api/labels/', // Replace with your API endpoint
+                type: 'GET',
+                success: function (response) {
+                    $('#label').empty();
+                    $.each(response, function (index, label) {
+                        $('#label').append($('<option>', {
+                            value: label.id,
+                            text: label.label_name
+                        }));
+                    });
+                }
+            });
+        }
+        populateLabels();
+
+
+        // Handle form submission
+        $('#addElectrodeForm').submit(function (event) {
+            event.preventDefault();
+            var formData = {
+                label_id: $('#label').val(),
+                category_id: $('#category').val(),
+                package: $('#package').val(),
+                // box: $('#box').val(),
+                // weight: $('#weight').val(),
+                // count_by_label: $('#count_by_label').val(),
+                description: $('#description').val()
+            };
+            $.ajax({
+                url: '/elektrod/electrode_crud/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    // Reload the page or update the table with the new data
+                    // Example: window.location.reload();
+                     $('#addElectrodeModal').modal('hide');
+                    location.reload();
+                    console.log(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+        populateCategories();
+        function populateCategories() {
+            
+            var labelId = $('#label').val() ? $('#label').val() : '1';
+            console.log(labelId);
+            $.ajax({
+                url: '/elektrod/api/categories/?label_id=' + labelId, // Adjust the endpoint to accept label_id parameter
+                type: 'GET',
+                success: function (response) {
+                    $('#category').empty();
+                    $.each(response, function (index, category) {
+                        $('#category').append($('<option>', {
+                            value: category.id,
+                            text: category.category_name
+                        }));
+                    });
+                }
+            });
+        }
+
+        // Call populateCategories() initially to populate categories based on the initial label value
+        
+
+        // Listen for changes in the label field and update categories accordingly
+        $('#label').change(function () {
+            populateCategories();
+        });
+
+
+
+        // add existing electrode
+        // $('.add-existing-electrode').click(function () {
+        //     console.log("clicked");
+        //     var electrodeId = $(this).data('id');
+        //     console.log("this is id", electrodeId);
+        //     $.ajax({
+        //         url: '/elektrod/get_electrode_data/',
+        //         method: 'GET',
+        //         data: { id: electrodeId },
+        //         success: function (response) {
+        //             $('#existingElectrodeId').val(response.id);
+        //             $('#existingElectrodeLabel').val(response.label);
+        //             $('#existingElectrodeCategory').val(response.category);
+        //             $('#existingElectrodePackage').val(response.package); // Populate package field
+        //             // Add logic to populate other fields as needed
+        //             $('#addExistingElectrodeModal').modal('show');
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error(error);
+        //         }
+        //     });
+        // });
+        $(document).on('click', '.add-existing-electrode', function () {
+            console.log("clicked");
+            var electrodeId = $(this).data('id');
+            console.log("this is id", electrodeId);
+            $.ajax({
+                url: '/elektrod/get_electrode_data/',
+                method: 'GET',
+                data: { id: electrodeId },
+                success: function (response) {
+                    $('#existingElectrodeId').val(response.id);
+                    $('#existingElectrodeLabel').val(response.label);
+                    $('#existingElectrodeCategory').val(response.category);
+                    $('#existingElectrodePackage').val(response.package); // Populate package field
+                    // Add logic to populate other fields as needed
+                    $('#addExistingElectrodeModal').modal('show');
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        // SAVE THE MODIFIED ELECTRODE
+        $('#addExistingElectrodeForm').submit(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            var formData = {
+                id: $('#existingElectrodeId').val(),
+                label: $('#existingElectrodeLabel').val(),
+                category: $('#existingElectrodeCategory').val(),
+                package: $('#existingElectrodePackage').val(),
+                // Add other fields as needed
+                description: $('#existingElectrodeDescription').val() // Example field
+            };
+            console.log("form data", formData)
+
+            $.ajax({
+                url: '/elektrod/electrode_crud/', // Adjust URL as per your Django URL pattern
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    $('#addExistingElectrodeModal').modal('hide');
+                    location.reload(); // Reload the page after successful submission
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = xhr.responseJSON.error || 'An error occurred';
+                    alert(errorMessage);
+                }
+            });
+        });
+
+    });
+</script>
+<style>
+    
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;
+    margin: 0 2px;
+    /* border: 1px solid #ccc;
+    border-radius: 5px; */
+    background-color: #f8f9fa;
+    color: #1976D2;
+    cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e9ecef;
+}
+</style>
+
+{% endblock %}

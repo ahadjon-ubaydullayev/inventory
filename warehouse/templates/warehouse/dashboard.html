@@ -2,6 +2,46 @@
 {% block content %}
 <div class="container-fluid">
     <h1 class="mt-4">Dashboard</h1>
+    <div class="row">
+        <!-- Total Products Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white hover">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <h1>{{ total_products }}</h1>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Total Customers Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card  bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Customers</h5>
+                    <h1>{{ total_customers }}</h1>
+                </div>
+            </div>
+        </div>
+    
+        <div class="col-md-3 mb-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <h1>{{ total_products }}</h1>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Customers Card -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Customers</h5>
+                    <h1>{{ total_customers }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row mt-4">
         <div class="col-md-6">
             <div class="card mb-4">
@@ -56,11 +96,22 @@
                     Recently Edited Products
                 </div>
                 <div class="card-body">
-                    <ul id="recentlyEditedList">
-                        {% for product in recently_edited %}
-                        <li>{{ product}}</li>
-                        {% endfor %}
-                    </ul>
+                    <table class="table-bordered table">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Transaction Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recently_edited %}
+                            <tr class="{% if item.transaction_type == 'Addition' %}bg-blue{% else %}bg-red{% endif %}">
+                                <td>{{ item.product_id }}</td>
+                                <td>{{ item.transaction_type }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -72,6 +123,21 @@
     // Use Chart.js to render charts
     // Use JavaScript to populate cards dynamically
 </script>
+<style>
+.bg-blue {
+background-color: #007bff; /* You can adjust the color code as needed */
+color: #fff; /* Text color */
+}
+
+/* Red background color */
+.bg-red {
+    background-color: #dc3545; /* You can adjust the color code as needed */
+    color: #fff; /* Text color */
+}
+.table tbody tr:hover {
+    background-color: black;
+}
+</style>
 </body>
 {% endblock %}
 
