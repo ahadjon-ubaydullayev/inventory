@@ -2,20 +2,21 @@
 {% block content %}
 <div class="container-fluid">
     <h3 class="mt-4">Mahsulotlar</h3>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMahsulotModal" data-tooltip="Mahsulot qo'shish">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMahsulotModal" data-tooltip="Mahsulot qo'shish" {% if is_manager %}disabled{% endif %}>
         Mahsulot qo'shish
     </button>
     <div class="card shadow mt-4 mb-5">
         <div class="card-body">
             <div class="exports">
-                <a href="">Export to PDF</a>
-                <a href="">Export to PDF</a>
-                <a href="">Export to PDF</a>
+                <a href="#" id="exportMahsulotButton">Export to XLS</a>
+                <!-- <a href="">Export to XLS</a>
+                <a href="">Export to DOC</a> -->
             </div>
             <div class="table-responsive mt-4">
                 <table id="mahsulot-table" class="table table-striped table-hover">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Nomi</th>
                             <th>Kategoriya</th>
                             <th>Qadoq</th>
@@ -30,6 +31,7 @@
                     <tbody>
                         {% for mahsulot in mahsulotlar %}
                         <tr>
+                            <td>{{ mahsulot.id }}</td>
                             <td>{{ mahsulot.nomi }}</td>
                             <td>{{ mahsulot.kategoriya }}</td>
                             <td>{{ mahsulot.qadoq }}</td>
@@ -39,14 +41,14 @@
                             <td>{{ mahsulot.kelgan_sana }}</td>
                             <td>{{ mahsulot.tavsifi }}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary add-existing-product" data-id="{{ mahsulot.id }}"  data-tooltip="Mahsulot qo'shish">
+                                <button class="btn btn-sm btn-primary add-existing-product" data-id="{{ mahsulot.id }}"  data-tooltip="Mahsulot qo'shish"  {% if is_manager %}disabled{% endif %}>
                                     <i class="fas fa-plus fa-sm"  aria-hidden="true"></i>
                                 </button>
                                 <button class="btn btn-sm btn-secondary send-product-icon" data-send-product-id="{{ mahsulot.id }}" data-tooltip="Mahsulot jo'natish" data-toggle="modal"
-                                    data-target="#sendProductModal">
+                                    data-target="#sendProductModal"  {% if is_manager %}disabled{% endif %}>
                                     <i class="fas fa-minus fa-sm" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" data-product-id="{{ mahsulot.id }}" data-tooltip="Mahsulot o'chirish">
+                                <button class="btn btn-sm btn-danger" data-product-id="{{ mahsulot.id }}" data-tooltip="Mahsulot o'chirish"  {% if is_manager %}disabled{% endif %}>
                                     <i class="fas fa-trash-alt delete-product-icon" data-toggle="modal" data-target="#confirmDeleteModal"></i>
                                 </button>
                                 
@@ -76,11 +78,11 @@
                 <form id="addMahsulotForm">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="nomi">Name:</label>
+                            <label for="nomi">Nomi:</label>
                             <input type="text" class="form-control" id="nomi" name="nomi" required>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="kategoriya">Category:</label>
+                            <label for="kategoriya">Kategoriya:</label>
                             <input type="text" class="form-control" id="kategoriya" name="kategoriya">
                         </div>
                     </div>
@@ -100,15 +102,15 @@
                             <input type="text" class="form-control" id="massa" name="massa" pattern="[0-9]+([.,][0-9]+)?" title="Please enter a valid number" min="0">
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="miqdori">Quantity:</label>
+                            <label for="miqdori">Miqdori:</label>
                             <input type="number" class="form-control" id="miqdori" name="miqdori" min="0" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="tavsifi">Description:</label>
+                        <label for="tavsifi">Tafsifi:</label>
                         <textarea class="form-control" id="tavsifi" name="tavsifi" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Mahsulot</button>
+                    <button type="submit" class="btn btn-primary">Mahsulot qo'shish</button>
                 </form>
             </div>
         </div>
@@ -132,12 +134,12 @@
                 <form id="addExistingProductForm"> 
                     <input type="hidden" id="existingProductId" name="id">
                     <div class="form-group">
-                        <label for="existingProductName">Product Name:</label>
+                        <label for="existingProductName">Mahsulot nomi:</label>
                         <input type="text" class="form-control" id="existingProductName" name="existingProductName"
                             readonly>
                     </div>
                     <div class="form-group">
-                        <label for="existingProductCategory">Category:</label>
+                        <label for="existingProductCategory">Kategoriya:</label>
                         <input type="text" class="form-control" id="existingProductCategory"
                             name="existingProductCategory" readonly>
                     </div>
@@ -145,7 +147,7 @@
                         <div class="form-group col-md-6">
                             <label for="existingProductQadoq">Qadoq:</label>
                             <input type="number" class="form-control" id="existingProductQadoq"
-                                name="existingProductQadoq" min="0" readonly>
+                                name="existingProductQadoq" min="0">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="existingProductQuti">Quti:</label>
@@ -157,20 +159,20 @@
                         <div class="form-group col-md-6">
                             <label for="existingProductMassa">Massa:</label>
                             <input type="number" class="form-control" id="existingProductMassa"
-                                name="existingProductMassa" min="0" readonly>
+                                name="existingProductMassa" min="0">
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="existingProductQuantity">Quantity:</label>
+                            <label for="existingProductQuantity">Miqdori:</label>
                             <input type="number" class="form-control" id="existingProductQuantity"
                                 name="existingProductQuantity" min="0" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="existingProductDescription">Description:</label>
+                        <label for="existingProductDescription">Tavsifi:</label>
                         <textarea class="form-control" id="existingProductDescription" name="existingProductDescription"
                             rows="3"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Existing Product</button>
+                    <button type="submit" class="btn btn-primary">Qo'shish</button>
                 </form>
             </div>
         </div>
@@ -185,19 +187,19 @@
         <div class="modal-content">
             <input type="hidden" id="send-product-id" name="send-product-id">
             <div class="modal-header">
-                <h5 class="modal-title" id="sendProductModalLabel">Send Product</h5>
+                <h5 class="modal-title" id="sendProductModalLabel">Mahsulot Jo'natish</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="sendProductQuantity">Quantity:</label>
+                    <label for="sendProductQuantity">Miqdori:</label>
                     <input type="number" class="form-control" id="sendProductQuantity" name="sendProductQuantity"
                         min="1" required>
                 </div>
                 <div class="form-group">
-                    <label for="customerSelect">Select Customer:</label>
+                    <label for="customerSelect">Mijozni tanlang:</label>
                     <select class="form-control" id="customerSelect" name="customerSelect" required>
                         <!-- Option elements for customers should be populated dynamically -->
                         {% for customer in customers %}
@@ -207,8 +209,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="sendProductButton">Send</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-primary" id="sendProductButton">Jo'natish</button>
             </div>
         </div>
     </div>
@@ -221,17 +223,17 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <h5 class="modal-title" id="confirmDeleteModalLabel">O'chirishni tasdiqlang</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this product?
+                Bu mahsulotni o'chirmoqchimisiz?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">O'chirish</button>
             </div>
         </div>
     </div>
@@ -261,17 +263,61 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="productDetailsModalLabel">Product Details</h5>
+                <h5 class="modal-title" id="productDetailsModalLabel">Mahsulot haqida</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <!-- Product details will be dynamically populated here -->
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4">ID:</th>
+                            <td class="col-md-8" id="product-detail-id"></td>
+                        </tr>
+                        <tr>
+                            <th>Nomi:</th>
+                            <td id="product-detail-name"></td>
+                        </tr>
+                        <tr>
+                            <th>Kategoriya:</th>
+                            <td id="product-detail-category"></td>
+                        </tr>
+                        <tr>
+                            <th>Qadoq:</th>
+                            <td id="product-detail-package"></td>
+                        </tr>
+                        <tr>
+                            <th>Quti:</th>
+                            <td id="product-detail-box"></td>
+                        </tr>
+                        <tr>
+                            <th>Massa:</th>
+                            <td id="product-detail-weight"></td>
+                        </tr>
+                        <tr>
+                            <th>Miqdori:</th>
+                            <td id="product-detail-quantity"></td>
+                        </tr>
+                        <tr>
+                            <th>Qo'shilgan sana:</th>
+                            <td id="product-detail-added-date"></td>
+                        </tr>
+                        
+                        <tr>
+                            <th>Tavsifi:</th>
+                            <td id="product-detail-description"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Yopish</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <style>
 .dataTables_wrapper .dataTables_paginate .paginate_button {
@@ -302,7 +348,7 @@
 {% endblock %}
 
 {% block scripts %}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 <script>
     $(document).ready(function () {
         // Initialize tooltips
@@ -312,6 +358,45 @@
             });
         });
     });
+
+// export to XLS
+    document.getElementById('exportMahsulotButton').addEventListener('click', function () {
+        // Fetch data from the table
+        let table = document.getElementById('mahsulot-table');
+        let data = [];
+
+        // Get headers (excluding the last one)
+        let headers = [];
+        for (let i = 0; i < table.querySelectorAll('thead th').length - 1; i++) {
+            headers.push(table.querySelectorAll('thead th')[i].innerText);
+        }
+        data.push(headers);
+
+        // Get rows (excluding the last cell in each row)
+        for (let tr of table.querySelectorAll('tbody tr')) {
+            let row = [];
+            for (let i = 0; i < tr.querySelectorAll('td').length - 1; i++) {
+                row.push(tr.querySelectorAll('td')[i].innerText);
+            }
+            data.push(row);
+        }
+
+        // Convert data to worksheet
+        let ws = XLSX.utils.aoa_to_sheet(data);
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Mahsulotlar");
+
+        // Get current date and format it
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        let yyyy = today.getFullYear();
+        let formattedDate = yyyy + '-' + mm + '-' + dd;
+
+        // Generate Excel file and trigger download with current date in the file name
+        XLSX.writeFile(wb, `mahsulotlar_data_${formattedDate}.xlsx`);
+    });
+
 </script>
 <style>
   

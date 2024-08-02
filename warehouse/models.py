@@ -48,11 +48,31 @@ class CustomUser(AbstractUser):
     )
 
 
+# class ProductHistory(models.Model):
+#     product_id = models.IntegerField()
+#     transaction_type = models.CharField(
+#         max_length=10)  # 'Addition' or 'Sending'
+#     quantity = models.IntegerField()
+#     customer_id = models.IntegerField(blank=True, null=True)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     description = models.TextField(blank=True, null=True)
+
 class ProductHistory(models.Model):
-    product_id = models.IntegerField()
-    transaction_type = models.CharField(
-        max_length=10)  # 'Addition' or 'Sending'
+    ACTION_CHOICES = [
+        ('ADD', 'Added'),
+        ('SEND', 'Sent to Customer'),
+    ]
+
+    # Assuming you have a Product model
+    product = models.ForeignKey(
+        'Mahsulot', on_delete=models.CASCADE, related_name='history')
+    transaction_type = models.CharField(max_length=10, choices=ACTION_CHOICES)
     quantity = models.IntegerField()
-    customer_id = models.IntegerField(blank=True, null=True)
+    # Using ForeignKey to reference Customer
+    customer = models.ForeignKey(
+        'Customer', on_delete=models.SET_NULL, blank=True, null=True, related_name='history')
     timestamp = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.product.nomi} - {self.get_transaction_type_display()}"

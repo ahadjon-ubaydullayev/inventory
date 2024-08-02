@@ -35,7 +35,7 @@ $('#addCustomerForm').submit(function(event) {
             location.reload();
         },
         error: function(xhr, status, error) {
-            console.error('Error adding customer:', error);
+            console.error('Error adding customer:', error); 
         }
     });
 

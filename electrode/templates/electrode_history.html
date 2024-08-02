@@ -10,7 +10,7 @@
                     <thead>
                         <tr>
                             <th>Mahsulot Nomi</th>
-                            <th>Holati</th> 
+                            <th>Holati</th>
                             <th>Miqdori</th>
                             <th>Mijoz</th>
                             <th>Sana</th>
@@ -19,16 +19,16 @@
                     </thead>
                     <tbody>
                         {% for entry in history %}
-                        <tr class="{% if entry.transaction_type == 'ADD' %} addition-row {% elif entry.transaction_type == 'SEND' %} substraction-row {% endif %}">
-                            <!-- <td>{{ entry.id }}</td> -->
-                            <td>{{ entry.product.nomi }}</td>
+                        <tr
+                            class="{% if entry.transaction_type == 'ADD' %} addition-row {% elif entry.transaction_type == 'SEND' %} substraction-row {% endif %}">
+                            <td>{{ entry.electrode.label}}</td>
                             <td>
                                 {% if entry.transaction_type == 'ADD' %}
                                 <span>Qo'shildi</span>
                                 {% elif entry.transaction_type == 'SEND' %}
                                 <span>Jo'natildi</span>
                                 {% else %}
-                                
+
                                 {% endif %}
                             </td>
                             <td>
@@ -38,9 +38,10 @@
                                 <span style=" font-weight: bold;">-</span>{{ entry.quantity }}
                                 {% else %}
                                 <span style=" font-weight: bold;">-</span>
-                                {% endif %}</td>
+                                {% endif %}
+                            </td>
                             <td>
-                                {% if entry.customer_id %}
+                                {% if entry.customer.name %}
                                 {{ entry.customer.name }}
                                 {% else %}
                                 <span style=" font-weight: bold;">-</span>
@@ -54,7 +55,7 @@
                                 <span style=" font-weight: bold;">-</span>
                                 {% endif %}
                             </td>
-                            
+
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -64,28 +65,27 @@
     </div>
 </div>
 <style>
-.addition-row {
-    color:#1976D2;
-}
+    .addition-row {
+        color: #1976D2;
+    }
 
-.substraction-row {
-    color: #FF5252;
-}
+    .substraction-row {
+        color: #FF5252;
+    }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 5px 10px;
-    margin: 0 2px;
-    /* border: 1px solid #ccc;
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 5px 10px;
+        margin: 0 2px;
+        /* border: 1px solid #ccc;
     border-radius: 5px; */
-    background-color: #f8f9fa;
-    color: #1976D2;
-    cursor: pointer;
-}
+        background-color: #f8f9fa;
+        color: #1976D2;
+        cursor: pointer;
+    }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background-color: #e9ecef;
-}
-
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #e9ecef;
+    }
 </style>
 
 {% endblock %}

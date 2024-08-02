@@ -3,7 +3,7 @@
 
 <div class="container-fluid">
     <h3 class="mt-4">Mijozlar</h3>
-    <button type="button" class="btn btn-primary" data-toggle="modal"  data-target="#addCustomerModal" data-tooltip="Mijoz Qo'shish">
+    <button type="button" class="btn btn-primary" data-toggle="modal"  data-target="#addCustomerModal" data-tooltip="Mijoz Qo'shish" {% if is_manager %}disabled{% endif %}>
         Mijoz qo'shish
     </button>
     <div class="card shadow mt-4 mb-5">
@@ -25,10 +25,10 @@
                             <td>{{ customer.location }}</td>
                             <td>{{ customer.phone_number }}</td>
                             <td>
-                                <button class="btn btn-sm btn-warning edit-customer" data-tooltip="Tahrirlash" data-id="{{ customer.id }}">
+                                <button class="btn btn-sm btn-warning edit-customer" data-tooltip="Tahrirlash" data-id="{{ customer.id }}" {% if is_manager %}disabled{% endif %}>
                                     <i class="fas fa-edit fa-sm" aria-hidden="true"></i> 
                                 </button>
-                            <button class="btn btn-sm btn-danger delete-customer" data-customer-id="{{ customer.id }}" data-tooltip="Mijozni o'chirish">
+                            <button class="btn btn-sm btn-danger delete-customer" data-customer-id="{{ customer.id }}" data-tooltip="Mijozni o'chirish" {% if is_manager %}disabled{% endif %}>
                                 <i class="fas fa-trash-alt fa-sm" aria-hidden="true" data-toggle="modal" data-target="#confirmCustomerDeleteModal"></i>
                             </button>
 

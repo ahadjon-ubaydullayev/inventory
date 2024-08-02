@@ -10,58 +10,198 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- css for warehouse -->
     <link rel="stylesheet" href="{% static 'css/main.css'%}">
+
+    <!-- css for electrode -->
+    <link rel="stylesheet" href="{% static 'electrode/css/main_electrode.css'%}">
+    <style>
+  /* Sidebar styles */
+.sidebar {
+    width: 250px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0; /* Initially visible */
+    transition: left 0.3s ease;
+    overflow-y: auto;
+}
+
+.sidebar.closed {
+    left: -250px; /* Hide sidebar */
+}
+
+.sidebar-header {
+    padding: 15px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    padding: 10px 15px;
+}
+
+.sidebar-menu li a {
+    display: block;
+    padding: 10px;
+}
+
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none; /* Hidden by default */
+}
+
+.extendable-link.active + .submenu {
+    display: block; /* Show submenu when active */
+}
+
+/* Toggle button styles */
+#sidebarToggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    z-index: 1000; /* Ensure it is above other content */
+    transition: transform 0.2s ease; /* Smooth animation for click effect */
+}
+
+#sidebarToggle:active {
+    transform: scale(0.9); /* Slightly reduce size on click */
+}
+
+/* Hamburger icon styles */
+.hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20px; /* Adjust width as needed */
+    height: 15px; /* Adjust height as needed */
+}
+
+.hamburger-icon .line {
+    background-color: #193fc7; /* Line color */
+    height: 3px; /* Line thickness */
+    width: 100%; /* Line width */
+    border-radius: 3px; /* Optional: Rounded corners for the lines */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Page content */
+.page-content {
+    margin-left: 1px; 
+    transition: margin-left 0.3s ease; /* Smooth transition */
+}
+
+/* Adjust DataTable width when sidebar is closed */
+.sidebar.closed ~ .page-content {
+    margin-left: -290px; /* Remove margin when sidebar is closed */
+    transition: margin-left 0.3s ease; /* Smooth transition */
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center; /* Center items vertically */
+}
+
+/* Container for the profile picture */
+.profile-pic-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center horizontally within the nav */
+    padding: 0 10px; /* Optional: Adjust space around the profile pic */
+}
+    </style>
 </head>
 
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <div class="" style="margin-left: -180px;"><a class="navbar-brand" href="#">
-                ASMO
-            </a></div>
-            
+            <button id="sidebarToggle" class="btn btn-primary">
+                <div class="hamburger-icon">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                </div>
+            </button>
+            <div class="" style="margin-left: -130px;">
+                <a class="navbar-brand"  href="{% url 'dashboard' %}">
+                    ASMO
+                </a>
+            </div>
                 <button class="navbar-toggler" type="button" id="sidebarToggle">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                        </div>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'login' %}">Login</a>
                     </li>
                     {% endif %}
-                    
                 </ul>
+                <!-- PROFILE PICTURE SECTION -->
+                <!-- <ul class="navbar-nav ml-auto">
+                    <li class="nav-item profile-pic-container">
+                        <img style=" width: 40px;" src="{{ profile_pic }}" alt="Profile Picture" class="profile-pic">
+                    </li>
+                </ul> -->
             </div>
         </div>
     </nav>
 
+    <!-- sidebar -->
     <div class="sidebar active" id="sidebar">
         <div class="sidebar-header">
             <h5 class="text-primary">Menyu</h5>
         </div>
         <ul class="sidebar-menu">
             <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-tachometer-alt"></i> Bosh Sahifa</a></li>
-            <li><a href="{% url 'mahsulotlar' %}"><i class="fas fa-box"></i> Omborxona</a></li>
             <li>
                 <a href="#" class="extendable-link">
                     <i class="fas fa-users"></i> <span>Mahsulotlar</span> <i class="fas fa-caret-down"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a  href="{% url 'elektrod' %}"><i class="fas fa-bolt"></i> Elektrodlar</a></li>
-                    <!-- <li><a href=""><i class="fas fa-paper-plane"></i> Mahsulot jo'natish</a></li> -->
+                    <li><a href="{% url 'mahsulotlar' %}"><i class="fas fa-box"></i> Omborxona</a></li>
+                    <li><a href="{% url 'elektrod' %}"><i class="fas fa-bolt"></i> Elektrodlar</a></li>
+                    
                 </ul>
             </li>
             <li><a href="{% url 'customers' %}"><i class="fas fa-users"></i> Mijozlar </a></li>
-            <li><a href="{% url 'product_history' %}"><i class="fas fa-history"></i> Mahsulotlar tarixi</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-        </ul>
+            <li>
+                <a href="#" class="extendable-link">
+                    <i class="fas fa-history"></i> <span>Mahsulotlar tarixi</span> <i class="fas fa-caret-down"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="{% url 'product_history' %}"><i class="fas fa-clipboard-list"></i> Mahsulotlar Tarixi</a></li>
+                    <li><a href="{% url 'electrode_history' %}"><i class="fas fa-bolt"></i> Elektrodlar Tarixi</a></li>
+                </ul>
+            </li> 
+            <!-- button for settings -->
+            <!-- <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li> -->
+     </ul>
     </div>
+    
     <!-- Page content -->
     <div class="page-content">
         <div class="container-fluid">
@@ -74,19 +214,43 @@
             </div>
         </div>
     </div>
+<style>
 
+</style>
+<script>
+   document.getElementById('sidebarToggle').addEventListener('click', function () {
+        let sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('closed');
+
+        let content = document.querySelector('.page-content');
+        content.classList.toggle('expanded'); // Toggle expanded class
+    });
+
+    // Optional: Add toggle functionality for extendable links
+    document.querySelectorAll('.extendable-link').forEach(link => {
+        link.addEventListener('click', function () {
+            this.classList.toggle('active');
+        });
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
-crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- warehouse static files -->
 <script src="{% static 'js/main.js'%}"></script>
 <script src="{% static 'js/dashboard.js'%}"></script>
 <script src="{% static 'js/send_product.js'%}"></script>
 <script src="{% static 'js/customer.js'%}"></script>
 <script src="{% static 'js/product_history.js'%}"></script>
+
+<!-- electrode static files -->
+<script src="{% static 'electrode/js/main_electrode.js'%}"></script>
 
 {% block scripts %}
 

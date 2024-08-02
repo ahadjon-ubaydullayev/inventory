@@ -54,7 +54,7 @@ $(document).ready(function () {
     $('#mahsulot-table').DataTable({
         "lengthMenu": [10, 25, 50, 100],
         "pageLength": 10, // Initial page length
-        "order": [[0, "asc"]], // Sort by the first column (Name) by default
+        "order": [[0, "desc"]], // Sort by the first column (Name) by default
         "responsive": true,
         "searching": true, // Enable search functionality
         "pagingType": "full_numbers", // Pagination type
@@ -70,7 +70,7 @@ $(document).ready(function () {
             }
         }
     });
-
+ 
 // add existing product
     $('.add-existing-product').click(function () {
         var productId = $(this).data('id');
@@ -95,6 +95,8 @@ $(document).ready(function () {
             }
         });
     });
+
+  
 
 
 // SAVE THE MODIFIED PRODUCT
@@ -157,7 +159,6 @@ $('#confirmDeleteButton').on('click', function() {
         }
     });
       });
-
 
 });
 

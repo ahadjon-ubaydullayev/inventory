@@ -1,7 +1,7 @@
-    // Show alert when button is clicked
-    $('.show-alert').click(function () {
-        alert("Button clicked!");
-    });
+// Show alert when button is clicked
+$('.show-alert').click(function () {
+    alert("Button clicked!");
+});
 
 
 // Send product to customer

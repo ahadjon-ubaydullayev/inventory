@@ -1,0 +1,13 @@
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 5px 10px;
+    margin: 0 2px;
+    /* border: 1px solid #ccc;
+    border-radius: 5px; */
+    background-color: #f8f9fa;
+    color: #1976D2;
+    cursor: pointer;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #e9ecef;
+}

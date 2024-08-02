@@ -28,10 +28,11 @@ def login_view(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.is_manager:
-                return redirect('manager_dashboard')
-            else:
-                return redirect('dashboard')
+            return redirect('dashboard')
+            # if user.is_manager:
+            #     return redirect('manager_dashboard')
+            # else:
+            #     return redirect('dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
     return render(request, 'auth/login.html')
@@ -79,17 +80,28 @@ def dashboard_manager(request):
 def mahsulot_list(request):
     mahsulotlar = Mahsulot.objects.all()
     customers = Customer.objects.all()
-    return render(request, 'warehouse/mahsulotlar.html', {'mahsulotlar': mahsulotlar, 'customers': customers})
+    user = request.user
+    is_manager = request.user.is_manager
+
+    return render(request, 'warehouse/mahsulotlar.html',
+                  {'mahsulotlar': mahsulotlar, 'customers': customers,
+                   'profile_pic': user.photo.url if user.photo else 'default-profile-pic-url', 'is_manager': is_manager})
 
 
 @csrf_exempt
 @login_required
 def mahsulot_crud(request):
+    # Check user role
+    if request.user.is_manager and request.method != 'GET':
+        return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
+
     if request.method == 'GET':
         mahsulotlar = list(Mahsulot.objects.values())
         return JsonResponse(mahsulotlar, safe=False)
 
     elif request.method == 'POST':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
         nomi = request.POST.get('nomi')
         kategoriya = request.POST.get('kategoriya')
         qadoq = request.POST.get('qadoq')
@@ -113,7 +125,6 @@ def mahsulot_crud(request):
                 transaction_type='Addition',
                 quantity=miqdori
             )
-            print(item)
             item.save()
             return JsonResponse({'message': 'Mahsulot quantity updated successfully', 'mahsulot_id': existing_product.pk})
         else:
@@ -130,12 +141,15 @@ def mahsulot_crud(request):
             # Log history of adding product
             ProductHistory.objects.create(
                 product_id=mahsulot.pk,
-                transaction_type='Addition',
+                transaction_type='ADD',
                 quantity=miqdori
             )
             return JsonResponse({'message': 'Mahsulot created successfully', 'mahsulot_id': mahsulot.pk})
 
     elif request.method == 'PUT':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
+
         data = json.loads(request.body)
         mahsulot_id = data.get('id')
         if not mahsulot_id:
@@ -146,25 +160,38 @@ def mahsulot_crud(request):
         except Mahsulot.DoesNotExist:
             return JsonResponse({'error': 'Mahsulot does not exist'}, status=404)
         existing_amount = mahsulot.miqdori
+
+        yangi_qadoq = data.get('qadoq', mahsulot.qadoq)
+        yangi_quti = data.get('quti', mahsulot.quti)
+        yangi_massa = data.get('massa', mahsulot.massa)
+        yangi_miqdori = data.get('miqdori', mahsulot.miqdori)
+
         mahsulot.nomi = data.get('nomi', mahsulot.nomi)
         mahsulot.kategoriya = data.get('kategoriya', mahsulot.kategoriya)
-        mahsulot.qadoq = data.get('qadoq', mahsulot.qadoq)
-        mahsulot.quti = data.get('quti', mahsulot.quti)
-        mahsulot.massa = data.get('massa', mahsulot.massa)
-        mahsulot.miqdori = data.get('miqdori', mahsulot.miqdori)
+        # mahsulot.qadoq = data.get('qadoq', mahsulot.qadoq)
+        # mahsulot.quti = data.get('quti', mahsulot.quti)
+        # mahsulot.massa = data.get('massa', mahsulot.massa)
+        # mahsulot.miqdori = data.get('miqdori', mahsulot.miqdori)
+        mahsulot.qadoq += int(yangi_qadoq)
+        mahsulot.quti += int(yangi_quti)
+        mahsulot.massa += int(yangi_massa)
+        mahsulot.miqdori += int(yangi_miqdori)
         mahsulot.kelgan_sana = data.get('kelgan_sana', mahsulot.kelgan_sana)
         mahsulot.tavsifi = data.get('tavsifi', mahsulot.tavsifi)
         mahsulot.save()
 
         added_amount = int(mahsulot.miqdori) - int(existing_amount)
+        product = get_object_or_404(Mahsulot, id=mahsulot_id)
         ProductHistory.objects.create(
-            product_id=mahsulot_id,
-            transaction_type='Addition',
-            quantity=added_amount  # Assuming miqdori represents the quantity added
+            product=product,
+            transaction_type='ADD',
+            quantity=yangi_miqdori
         )
         return JsonResponse({'message': 'Mahsulot updated successfully'})
 
     elif request.method == 'DELETE':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
         data = json.loads(request.body)
         mahsulot_id = data.get('id')
         if not mahsulot_id:
@@ -183,6 +210,8 @@ def mahsulot_crud(request):
 @csrf_exempt
 def send_product(request):
     if request.method == 'POST':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
         data = json.loads(request.body)
         product_id = data.get('product_id')
         quantity = data.get('quantity')
@@ -202,11 +231,17 @@ def send_product(request):
 
         product.miqdori -= int(quantity)
         product.save()
+        # ProductHistory.objects.create(
+        #     product_id=product_id,
+        #     customer_id=customer_id,
+        #     transaction_type='Substraction',
+        #     quantity=quantity
+        # )
         ProductHistory.objects.create(
-            product_id=product_id,
-            customer_id=customer_id,
-            transaction_type='Substraction',
-            quantity=quantity
+            product=product,
+            customer=customer,
+            transaction_type='SEND',  # Using the choice from ACTION_CHOICES
+            quantity=int(quantity)
         )
 
         return JsonResponse({'message': 'Product sent successfully'})
@@ -237,12 +272,17 @@ def get_product_data(request):
 @login_required
 def customers(request):
     customers = Customer.objects.all()
-    return render(request, 'warehouse/customers.html', {'customers': customers})
+    is_manager = request.user.is_manager
+    return render(request, 'warehouse/customers.html', {'customers': customers, 'is_manager': is_manager})
 
 
-@login_required
+# Forbidden(CSRF token missing.) error in this view --- error fixed.
+# @login_required
 @csrf_exempt
 def customer_crud(request, id=None):
+    if request.user.is_manager and request.method != 'GET':
+        return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
+
     if request.method == 'GET':
         if request.GET.get('id'):
             customer_id = request.GET.get('id')
@@ -258,6 +298,8 @@ def customer_crud(request, id=None):
             return JsonResponse(customers, safe=False)
 
     elif request.method == 'POST':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
         name = request.POST.get('customerName')
         location = request.POST.get('customerLocation')
         phone_number = request.POST.get('customerPhoneNumber')
@@ -266,6 +308,9 @@ def customer_crud(request, id=None):
         return JsonResponse({'message': 'Customer created successfully', 'customer_id': customer.pk})
 
     elif request.method == 'PUT':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
+
         data = json.loads(request.body)
         customer_id = data.get('id')
         customer = get_object_or_404(Customer, id=customer_id)
@@ -276,6 +321,8 @@ def customer_crud(request, id=None):
         return JsonResponse({'message': 'Customer updated successfully'})
 
     elif request.method == 'DELETE':
+        if request.user.is_manager:
+            return JsonResponse({'error': 'You do not have permission to perform this action.'}, status=403)
         try:
             data = json.loads(request.body)
             customer_id = data.get('id')
